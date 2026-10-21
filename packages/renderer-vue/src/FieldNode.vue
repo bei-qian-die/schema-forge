@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import {
+  compileExpression,
   defaultValueForType,
   deepClone,
-  evaluateExpression,
+  evaluate,
   isLayoutType,
+  type CompiledExpression,
+  type EvaluationScope,
   type FieldNode,
   type FieldStatus,
   type Form,
 } from '@schema-forge/core'
 import { getFieldComponent } from './registry'
-import { useField } from './useField'
+import { useField, type LocalFieldScope } from './useField'
 import UnknownField from './UnknownField.vue'
 
 const props = defineProps<{
@@ -33,27 +36,37 @@ const controlId = `sf-${Math.random().toString(36).slice(2, 9)}`
 const bare = computed(() => props.node.type === 'divider' || props.node.type === 'static')
 const activeTab = ref(0)
 
-function evaluateFlag(raw: unknown, fallback: boolean): boolean {
-  if (raw === undefined) return fallback
-  if (typeof raw === 'boolean') return raw
-  if (typeof raw !== 'string') return fallback
+const localFlagSources = computed(
+  () => [props.node.visible, props.node.disabled, props.node.required] as const,
+)
+const localFlagExpressions = computed(() =>
+  localFlagSources.value.map((raw) =>
+    typeof raw === 'string' ? compileExpression(raw) : undefined,
+  ),
+)
+const localDependencies = computed<string[]>(() => {
+  const dependencies = new Set<string>()
+  for (const expression of localFlagExpressions.value) {
+    for (const dependency of expression?.dependencies ?? []) {
+      if (dependency.kind === 'status') {
+        const lastDot = dependency.path.lastIndexOf('.')
+        if (lastDot > 0) dependencies.add(dependency.path.slice(0, lastDot))
+      } else if (dependency.path) {
+        dependencies.add(dependency.path)
+      }
+    }
+  }
+  return [...dependencies]
+})
+
+function evaluateFlag(
+  expression: CompiledExpression | undefined,
+  fallback: boolean,
+  scope: EvaluationScope,
+): boolean {
+  if (!expression) return fallback
   try {
-    return Boolean(
-      evaluateExpression(raw, {
-        form: props.form.getValues(),
-        values: props.form.getValues(),
-        self: props.form.getValue(path.value),
-        index: props.index ?? 0,
-        resolveStatus: (statusPath) => {
-          const lastDot = statusPath.lastIndexOf('.')
-          if (lastDot === -1) return undefined
-          const fieldKey = statusPath.slice(0, lastDot)
-          const prop = statusPath.slice(lastDot + 1)
-          const entry = props.form.getStatus(fieldKey) as unknown as Record<string, unknown>
-          return entry?.[prop]
-        },
-      }),
-    )
+    return Boolean(evaluate(expression.ast, scope))
   } catch {
     return fallback
   }
@@ -61,17 +74,46 @@ function evaluateFlag(raw: unknown, fallback: boolean): boolean {
 
 /** Row children are not part of the compiled graph, so evaluate locally. */
 function localStatus(): FieldStatus {
+  const values = props.form.getValuesView()
+  const scope: EvaluationScope = {
+    form: values,
+    values,
+    self: props.form.getValue(path.value),
+    index: props.index ?? 0,
+    resolveStatus: (statusPath) => {
+      const lastDot = statusPath.lastIndexOf('.')
+      if (lastDot === -1) return undefined
+      const fieldKey = statusPath.slice(0, lastDot)
+      const prop = statusPath.slice(lastDot + 1)
+      const entry = props.form.getStatus(fieldKey) as unknown as Record<string, unknown>
+      return entry?.[prop]
+    },
+  }
+  const sources = localFlagSources.value
+  const expressions = localFlagExpressions.value
+  const read = (position: 0 | 1 | 2, fallback: boolean) => {
+    const raw = sources[position]
+    if (typeof raw === 'boolean') return raw
+    return evaluateFlag(expressions[position], fallback, scope)
+  }
   return {
-    visible: evaluateFlag(props.node.visible, true),
-    disabled: evaluateFlag(props.node.disabled, false),
-    required: evaluateFlag(props.node.required, false),
+    visible: read(0, true),
+    disabled: read(1, false),
+    required: read(2, false),
   }
 }
+
+const localScope = computed<LocalFieldScope>(() => ({
+  path:
+    props.prefix === undefined ? undefined : `${props.prefix}[${props.index ?? 0}]`,
+  dependencies: localDependencies.value,
+}))
 
 const { status, errors, value } = useField(
   props.form,
   path,
   compiled.value ? undefined : localStatus,
+  () => localScope.value,
 )
 
 const requiredMark = computed(

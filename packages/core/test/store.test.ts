@@ -234,6 +234,20 @@ describe('serialization, reset and events', () => {
     expect(form.isVisible('company.taxNo')).toBe(false)
     expect(form.getStats().revision).toBeGreaterThan(0)
   })
+
+  it('exposes a live read view while getValues keeps cloning', () => {
+    const form = createForm(invoiceSchema())
+    const view = form.getValuesView()
+    expect(view.amount).toBe(0)
+
+    form.setValue('amount', 42)
+    expect(view.amount).toBe(42)
+    expect(form.getValues()).not.toBe(view)
+
+    const snapshot = form.getValues()
+    ;(snapshot as Record<string, unknown>).amount = 0
+    expect(form.getValue('amount')).toBe(42)
+  })
 })
 
 describe('compile diagnostics', () => {

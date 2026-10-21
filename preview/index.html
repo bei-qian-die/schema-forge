@@ -26,7 +26,7 @@
       <a href="#roadmap">排期</a>
       <a href="#resume">简历话术</a>
     </nav>
-    <span class="npm-chip mono">npm i <b>@schema-forge/core</b></span>
+    <span class="npm-chip mono">core · <b>0 runtime deps</b></span>
   </div>
 </header>
 
@@ -54,20 +54,20 @@
 
         <dl class="metrics reveal" data-d="3">
           <div>
-            <dt>单次输入重算</dt>
-            <dd class="up">9.4<small> ms · −98%</small></dd>
+            <dt>单次触发 effect</dt>
+            <dd class="up">2<small> / 120 · 跳过 98.3%</small></dd>
           </div>
           <div>
-            <dt>500 字段首屏</dt>
-            <dd>380<small> ms · −82%</small></dd>
+            <dt>core 单测</dt>
+            <dd>71<small> 条 · 5 文件</small></dd>
           </div>
           <div>
             <dt>core gzip</dt>
-            <dd>12.8<small> KB · 零依赖</small></dd>
+            <dd>12.6<small> KB · minified</small></dd>
           </div>
           <div>
-            <dt>单测覆盖率</dt>
-            <dd>91<small> % · core 96%</small></dd>
+            <dt>core 行覆盖率</dt>
+            <dd>85.1<small> % · v8</small></dd>
           </div>
         </dl>
       </div>
@@ -90,7 +90,7 @@ deps  <span class="k">→</span> <span class="v">{invoice.type}</span>
 graph <span class="k">→</span> <span class="n">toposort</span>    <span class="p">5 nodes</span>
 cycle <span class="k">→</span> <span class="n">none</span>
 <span class="k">propagate</span><span class="p">(</span><span class="s">"invoice.type"</span><span class="p">)</span>
-  <span class="k">→</span> <span class="n">touched</span> <span class="v">3</span> <span class="p">/ 500</span></pre>
+  <span class="k">→</span> <span class="n">touched</span> <span class="v">3</span> <span class="p">/ 17</span></pre>
         </div>
         <div class="stamp"><div><b>v1.0.0</b><span>RESUME<br>READY</span></div></div>
       </div>
@@ -209,14 +209,14 @@ cycle <span class="k">→</span> <span class="n">none</span>
         <h3>工程化链路</h3>
         <p class="flow__note">决定这个项目「像不像正经开源项目」</p>
         <ol class="steps">
-          <li>pnpm monorepo + changesets 版本管理</li>
-          <li>vitest 单测：core 零 DOM 依赖，纯函数好测，目标 ≥ 90%</li>
-          <li>tsdown 打包 ESM + CJS + d.ts，<code>size-limit</code> 卡 gzip &lt; 15 KB</li>
-          <li>GitHub Actions：install → lint → test → build → size → 发布</li>
-          <li>Playground 自动部署 GitHub Pages（简历上可点）</li>
-          <li>压测靶场：500 字段 / 120 联动，一键对比全量 vs 精准</li>
+          <li>pnpm monorepo（changesets 未接入）</li>
+          <li>vitest 单测：core 零 DOM 依赖，当前 71 条，行覆盖 85.1%</li>
+          <li>tsdown 打包 ESM + CJS + d.ts，minify 后 gzip 12.6 KB</li>
+          <li>GitHub Actions：typecheck → test → build，main 分支部署 Pages</li>
+          <li>Playground 可静态构建，CI 含 Pages job（需在仓库启用）</li>
+          <li>压测靶场：500 字段 / 120 联动，含小表单 crossover 曲线</li>
         </ol>
-        <p class="flow__gain">README 顶部四件套：<b>npm badge + CI badge + 一张效果图 + 30 秒 Quick Start</b>。</p>
+        <p class="flow__gain">README 顶部：<b>项目 badge + 一张效果图 + 30 秒 Quick Start</b>。</p>
       </article>
 
     </div>
@@ -270,7 +270,7 @@ cycle <span class="k">→</span> <span class="n">none</span>
           <div>
             <h4>编译内核 · 零依赖</h4>
             <p>只认识「一份 Schema + 一组数据」，是一台纯函数编译器：<code>(schema, data) → (可见性, 错误, 值)</code>。可独立发布、可在 Node/Worker 里跑。</p>
-            <div class="pkgs"><span class="pkg">@schema-forge/core</span><span class="pkg">gzip 12.8 KB</span></div>
+            <div class="pkgs"><span class="pkg">@schema-forge/core</span><span class="pkg">gzip 12.6 KB</span></div>
           </div>
         </div>
 
@@ -308,7 +308,7 @@ cycle <span class="k">→</span> <span class="n">none</span>
       <p class="sec__no">§ 04 — 唯一有技术壁垒的一段</p>
       <h2 class="sec__title">表达式 → 依赖图 → 拓扑求值 → 精准传播</h2>
       <p class="sec__sub">
-        朴素做法：改一个输入框就把 500 个字段的联动全跑一遍 —— <b>480ms 卡顿</b>，而且求值顺序取决于遍历序，
+        朴素做法：改一个输入框就把 500 个字段的 120 条联动全跑一遍，而且求值顺序取决于遍历序，
         有环时静默算错。下面是解法。
       </p>
     </div>
@@ -426,14 +426,14 @@ cycle <span class="k">→</span> <span class="n">none</span>
         </div>
 
         <div class="perf reveal" data-d="2" style="margin-top:var(--s4)">
-          <div class="perf__cap"><span>500 字段 / 120 联动 · 实测</span><b>−98%</b></div>
+          <div class="perf__cap"><span>500 字段 / 120 联动 · 实测</span><b>跳过 98.3%</b></div>
           <table>
-            <tr><td>单次输入重算耗时</td><td class="n"><del>480 ms</del> → <b>9.4 ms</b></td></tr>
-            <tr><td>平均重算字段数</td><td class="n"><del>500</del> → <b>4.2</b></td></tr>
-            <tr><td>500 字段首屏渲染</td><td class="n"><del>2,100 ms</del> → <b>380 ms</b></td></tr>
-            <tr><td>首屏 DOM 节点数</td><td class="n"><del>8,400</del> → <b>610</b></td></tr>
-            <tr><td>异步校验重复请求</td><td class="n"><del>100%</del> → <b>22%</b></td></tr>
-            <tr><td>core gzip / 单测覆盖</td><td class="n"><b>12.8 KB</b> · <b>91%</b></td></tr>
+            <tr><td>单次触发 effect 求值</td><td class="n"><del>120 条</del> → <b>2 条</b></td></tr>
+            <tr><td>500 字段传播耗时</td><td class="n">约为全量扫描的 <b>4–7×</b>（随机器变化）</td></tr>
+            <tr><td>小表单边界</td><td class="n">120 字段可能 <b>&lt; 1×</b>，见 crossover 曲线</td></tr>
+            <tr><td>500 字段首屏 / DOM</td><td class="n"><b>未测量</b>（虚拟滚动未实现）</td></tr>
+            <tr><td>异步请求合并</td><td class="n"><b>未测量</b>（仅暴露计数器）</td></tr>
+            <tr><td>core gzip / 行覆盖</td><td class="n"><b>12.6 KB</b> · <b>85.1%</b></td></tr>
           </table>
         </div>
       </div>
@@ -651,7 +651,7 @@ cycle <span class="k">→</span> <span class="n">none</span>
               <div class="prow">
                 <label>规则 2 · async-remote</label>
                 <div class="expr"><span class="fn">checkTaxNo</span>(<span class="v">$self</span>) <span class="o">·</span> debounce <span class="s">300ms</span></div>
-                <div class="depnote">同 key 请求合并 · <span class="ok">−78%</span></div>
+                <div class="depnote">同 key 请求合并 · <span class="ok">只保留最后一次</span></div>
               </div>
               <div class="prow">
                 <label>触发时机 validateOn</label>
@@ -785,7 +785,7 @@ cycle <span class="k">→</span> <span class="n">none</span>
         <ul class="rt-log" id="rt-log" aria-live="polite"></ul>
 
         <div class="rt-meter">
-          <div class="rt-meter__row"><span>全量重算（朴素做法）</span><b>480 ms</b></div>
+          <div class="rt-meter__row"><span>全量重算（朴素做法）</span><b>全量扫描</b></div>
           <div class="bar bar--old"><i style="width:100%"></i></div>
           <div class="rt-meter__row" style="margin-top:12px"><span>精准传播（本引擎）</span><b id="rt-cost">— ms</b></div>
           <div class="bar"><i id="rt-bar" style="width:2%"></i></div>
@@ -912,13 +912,13 @@ registerMaterial(InputMaterial)   <span class="cm">// 第三方也能注册</spa
             <td class="w"></td><td class="w"></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
           <tr><td>W4</td><td>状态树 + 校验引擎</td>
             <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
-          <tr><td>W5</td><td>Vue3 渲染器 + 虚拟化</td>
+          <tr><td>W5</td><td>Vue3 渲染器 + 数组容器（未做虚拟滚动）</td>
             <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
           <tr><td>W6</td><td><b>设计器</b> 拖拽 + Patch + undo + 自举面板</td>
             <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"></td><td class="w"></td></tr>
           <tr><td>W7</td><td>迁移链 + 类型推导 + 压测优化</td>
             <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell mid"><i></i></span></td><td class="w"></td></tr>
-          <tr><td>W8</td><td>npm 发布 + Playground + 技术文章</td>
+          <tr><td>W8</td><td>Playground + CI/Pages + 技术文章</td>
             <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell mid"><i></i></span></td><td class="w"><span class="cell mid"><i></i></span></td></tr>
         </tbody>
         <tfoot>
@@ -939,13 +939,13 @@ registerMaterial(InputMaterial)   <span class="cm">// 第三方也能注册</spa
 
     <div class="resume reveal">
       <h3>schema-forge · Schema 驱动的表单引擎与可视化搭建平台</h3>
-      <p class="resume__meta">作者 / 独立开发　·　TypeScript + Vue 3 + Vite + pnpm Monorepo　·　2026.10 – 2026.12　·　npm v1.0.0</p>
+      <p class="resume__meta">作者 / 独立开发　·　TypeScript + Vue 3 + Vite + pnpm Monorepo　·　2026.10 – 2026.12　·　GitHub Actions CI</p>
       <ul>
-        <li>自研 Schema 驱动的表单引擎与可视化搭建平台，拆分为<b>框架无关的 core 编译内核</b>与 Vue3 适配层，已发布 npm（v1.0.0）。</li>
-        <li>实现<b>表达式引擎</b>：手写词法分析与递归下降 parser，支持路径取值、三元、逻辑运算与白名单函数；不使用 <code>new Function</code>，规避 CSP <code>unsafe-eval</code> 限制，并支持从 AST 精确收集字段依赖。</li>
+        <li>自研 Schema 驱动的表单引擎与可视化搭建平台，拆分为<b>框架无关的 core 编译内核</b>与 Vue3 适配层，pnpm workspace 多包工程并接入 CI 质量门禁。</li>
+        <li>实现<b>表达式引擎</b>：手写词法分析与优先级爬升 parser，支持路径取值、三元、逻辑运算与白名单函数；不使用 <code>new Function</code>，规避 CSP <code>unsafe-eval</code> 限制，并支持从 AST 精确收集字段依赖。</li>
         <li>设计<b>字段联动依赖图</b>：以字段为节点构建有向图，Kahn 拓扑排序确定求值顺序，DFS 三色标记检测循环依赖并输出环路径。</li>
         <li>实现<b>精准脏值传播</b>：变更时沿反向边求下游闭包，仅重算受影响字段并递增版本号，配合 Vue 层字段级订阅实现精准更新。</li>
-        <li>500 字段 / 120 联动规则场景下，单次输入重算耗时 <b>480ms → 9.4ms（−98%）</b>，首屏渲染 2100ms → 380ms，首屏 DOM 节点 8400 → 610。</li>
+        <li>500 字段 / 120 联动规则场景下，单次输入只求值 <b>2 条</b>受影响 effect（跳过 98.3%），本机多次测量约 <b>4–7×</b> 传播加速；小表单上依赖图开销可能高于全量扫描，首屏与 DOM 指标未测量。</li>
         <li>基于 <b>RFC 6902 JSON Patch</b> 实现撤销重做（300ms 合并窗口），并为后续协同编辑预留增量通道。</li>
         <li>属性面板<b>自举</b>：用引擎自身渲染引擎的属性配置界面；实现 <code>InferFormData&lt;S&gt;</code> 类型推导，提交数据结构具备编译期提示。</li>
       </ul>
@@ -970,11 +970,11 @@ registerMaterial(InputMaterial)   <span class="cm">// 第三方也能注册</spa
       </details>
       <details>
         <summary>大表单卡顿有三个来源，怎么分别解决？</summary>
-        <p class="a">① 全量重算 → 依赖图 + 精准传播；② 全量渲染 → 虚拟滚动 + 折叠容器懒挂载（DOM 8400→610）；③ 校验风暴 → 同步规则立即跑、异步规则防抖 300ms 且同 key 请求合并（重复请求 −78%）。三者都要有实测数字。</p>
+        <p class="a">① 全量重算 → 依赖图 + 精准传播（500 字段样本里 120 条 effect 降到 2 条）；② 全量渲染 → <b>尚未做虚拟滚动</b>，这是已知缺口，不宣称 DOM 优化；③ 校验风暴 → 同步规则立即跑、异步规则防抖 300ms（站点配置 420ms）且同 key 请求合并。只有①有实测数字。</p>
       </details>
       <details>
         <summary>撤销重做为什么用 JSON Patch？</summary>
-        <p class="a">Patch 是最小增量、可序列化、可传输。直接存整份 Schema 快照 200 步就要几十 MB；Patch 栈只有 1.2MB。更重要的是：将来接 Yjs 做多人协同时，网络上传的本来就是 Patch，不用改架构 —— 这叫前瞻性设计。</p>
+        <p class="a">Patch 是最小增量、可序列化、可传输。直接存整份 Schema 快照 200 步会迅速膨胀；Patch 栈只存增量。更重要的是：将来接 Yjs 做多人协同时，网络上传的本来就是 Patch，不用改架构。</p>
       </details>
       <details>
         <summary>Schema 升级后老数据崩了怎么办？</summary>
@@ -993,7 +993,7 @@ registerMaterial(InputMaterial)   <span class="cm">// 第三方也能注册</spa
     <p class="foot__meta">
       schema-forge · project plan &amp; visual preview<br>
       8 weeks · TypeScript / Vue 3 / pnpm monorepo<br>
-      core gzip 12.8 KB · 91% coverage
+      core gzip 12.6 KB · 85.1% coverage
     </p>
   </div>
 </footer>

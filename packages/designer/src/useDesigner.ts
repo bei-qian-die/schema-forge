@@ -128,7 +128,11 @@ export function useDesigner(options: {
       : createDefaultSchema()
 
   const schema = ref<FormSchema>(start)
-  const program = computed(() => compileSchema(schema.value))
+  // Compilation is debounced so dragging a slider or typing a label does not
+  // rebuild the whole graph on every keystroke. The canvas reads `schema`
+  // directly, so edits still appear immediately.
+  const compiledSchema = ref<FormSchema>(start)
+  const program = computed(() => compileSchema(compiledSchema.value))
   const mode = ref<DesignerMode>('design')
   const inspectorTab = ref<InspectorTab>('props')
   const drawerOpen = ref(true)
@@ -172,6 +176,7 @@ export function useDesigner(options: {
   })
 
   let saveTimer: ReturnType<typeof setTimeout> | null = null
+  let compileTimer: ReturnType<typeof setTimeout> | null = null
   let lastSavedSnapshot = JSON.stringify(start)
 
   function makeSave(): void {
@@ -214,11 +219,16 @@ export function useDesigner(options: {
 
   watch(
     schema,
-    () => {
+    (next) => {
       scheduleSave()
       if (!selectedPointer.value || !nodeAt(schema.value, selectedPointer.value)) {
         selectedPointer.value = firstLeafPointer(schema.value.fields)
       }
+      if (compileTimer) clearTimeout(compileTimer)
+      compileTimer = setTimeout(() => {
+        compileTimer = null
+        compiledSchema.value = next
+      }, 150)
     },
     { deep: false },
   )
@@ -229,6 +239,10 @@ export function useDesigner(options: {
   }
   onBeforeUnmount(() => {
     if (typeof window !== 'undefined') window.removeEventListener('beforeunload', beforeUnload)
+    if (compileTimer) {
+      clearTimeout(compileTimer)
+      compileTimer = null
+    }
     flushSave()
   })
 

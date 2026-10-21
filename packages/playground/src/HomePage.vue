@@ -142,7 +142,7 @@ const testFiles = [
   { name: 'graph.test.ts', count: 9, note: 'Kahn / 三色环 / 闭包 / 传播' },
   { name: 'patch.test.ts', count: 11, note: 'RFC 6902 / diff / undo 合并' },
   { name: 'protocol.test.ts', count: 14, note: '迁移链 / 规范化 / 类型推导' },
-  { name: 'store.test.ts', count: 19, note: '联动 / 校验 / 异步 / 序列化' },
+  { name: 'store.test.ts', count: 20, note: '联动 / 校验 / 异步 / 序列化 / 只读视图' },
 ]
 
 const roadmap = [
@@ -153,7 +153,7 @@ const roadmap = [
   { week: 'W5', title: 'Vue 3 渲染器', status: 'partial', note: '已落地；虚拟滚动未做' },
   { week: 'W6', title: '设计器', status: 'done', note: '拖拽 / Patch / undo / 自举面板 / LogicBoard' },
   { week: 'W7', title: '迁移链 + 类型推导 + 压测', status: 'done', note: 'migrate v1→2.0 / InferFormData / 基准面板' },
-  { week: 'W8', title: 'npm 发布 + Playground + 文章', status: 'partial', note: 'Playground 已就绪；发布与文章待办' },
+  { week: 'W8', title: 'Playground + CI/Pages + 文章', status: 'partial', note: 'Playground、CI/Pages 与技术文章已就绪；npm 发布不在计划内' },
 ]
 
 const statusLabel: Record<string, string> = {
@@ -412,10 +412,10 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
               <p class="lp-flow__note">决定它像不像一个正经项目。</p>
               <ol>
                 <li>pnpm workspace · 5 个包 · TS strict</li>
-                <li>70 个 core 单测，零 DOM 依赖好测</li>
+                <li>71 个 core 单测，零 DOM 依赖好测</li>
                 <li>tsdown 输出 ESM + CJS + <code>.d.ts</code></li>
                 <li><code>vue-tsc --noEmit</code> 全仓库类型检查</li>
-                <li>GitHub Actions：typecheck → test → build</li>
+                <li>GitHub Actions：typecheck → test → build → Pages</li>
               </ol>
               <p class="lp-flow__gain">core 只依赖 TypeScript 与浏览器标准 API，发布包无运行时依赖。</p>
             </article>
@@ -543,7 +543,7 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
               <span class="lp-algo__no">01 / SANDBOX</span>
               <h3>手写表达式引擎</h3>
               <p>
-                词法分析 + 递归下降 parser，支持路径、三元、逻辑与白名单函数。
+                词法分析 + 优先级爬升 parser，支持路径、三元、逻辑与白名单函数。
                 不使用 <code>new Function</code>，可在 CSP <code>unsafe-eval</code> 环境运行。
               </p>
               <div class="lp-minicode">
@@ -823,7 +823,7 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
 
           <div class="lp-engineering">
             <div class="lp-testcard">
-              <div class="lp-testcard__cap"><span>packages/core/test</span><b>70 passed</b></div>
+              <div class="lp-testcard__cap"><span>packages/core/test</span><b>71 passed</b></div>
               <ul>
                 <li v-for="file in testFiles" :key="file.name">
                   <div>
@@ -831,7 +831,7 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
                     <span>{{ file.note }}</span>
                   </div>
                   <div class="lp-testcard__bar">
-                    <i :style="{ width: `${(file.count / 18) * 100}%` }"></i>
+                    <i :style="{ width: `${(file.count / 20) * 100}%` }"></i>
                   </div>
                   <b>{{ file.count }}</b>
                 </li>
@@ -846,7 +846,7 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
                 <div class="lp-gates__cap"><span>本地命令</span><b>pnpm</b></div>
                 <div class="lp-cmd"><code>pnpm install</code><span>安装 workspace 依赖</span></div>
                 <div class="lp-cmd"><code>pnpm dev</code><span>启动本页与设计器</span></div>
-                <div class="lp-cmd"><code>pnpm test</code><span>70 条 core 单测</span></div>
+                <div class="lp-cmd"><code>pnpm test</code><span>71 条 core 单测</span></div>
                 <div class="lp-cmd"><code>pnpm typecheck</code><span>vue-tsc 全仓库</span></div>
                 <div class="lp-cmd"><code>pnpm build</code><span>core 产物 + 静态站点</span></div>
               </div>
@@ -857,8 +857,7 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
                   <span>install</span><i>→</i><span>typecheck</span><i>→</i><span>test</span><i>→</i><span>build</span>
                 </div>
                 <p>
-                  流水线定义在 <code>.github/workflows/ci.yml</code>。
-                  Playground 使用相对路径构建，静态产物可直接部署到 GitHub Pages。
+                  流水线定义在 <code>.github/workflows/ci.yml</code>：main 分支先跑质量门禁，再把构建产物发布到 GitHub Pages（仓库需启用 Pages）。
                 </p>
                 <p class="lp-gates__note">
                   尚未发布 npm 包，也未接入 changesets / size-limit —— 这些是路线图，不是已完成项。
@@ -1008,7 +1007,7 @@ const testTotal = testFiles.reduce((total, file) => total + file.count, 0)
         </div>
         <p class="lp-footer__meta">
           TypeScript 5.7 · Vue 3.5 · Vite 6 · pnpm monorepo<br />
-          protocol v2.0 · 70 tests · 0 core runtime deps<br />
+          protocol v2.0 · 71 tests · 0 core runtime deps<br />
           2026 · built from source, not from a template
         </p>
       </div>

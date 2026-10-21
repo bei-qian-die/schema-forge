@@ -13,8 +13,10 @@ export default defineConfig({
     include: ['packages/core/test/**/*.test.ts'],
     environment: 'node',
     coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
       include: ['packages/core/src/**/*.ts'],
-      exclude: ['packages/core/src/index.ts'],
+      exclude: ['packages/core/src/index.ts', 'packages/core/src/protocol/infer.ts'],
     },
   },
 })

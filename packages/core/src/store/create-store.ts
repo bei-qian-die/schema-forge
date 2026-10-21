@@ -110,6 +110,11 @@ export interface Form {
   readonly program: FormProgram
   getValue<T = unknown>(path: string): T | undefined
   getValues(): Record<string, unknown>
+  /**
+   * Live read-only view for expression evaluation. Never mutate it; use
+   * `getValues()` when the caller needs an independent snapshot.
+   */
+  getValuesView(): Readonly<Record<string, unknown>>
   getStatus(path: string): FieldStatus
   getErrors(path: string): string[]
   getErrorTree(): ErrorTree
@@ -447,6 +452,10 @@ export function createForm(
 
     getValues(): Record<string, unknown> {
       return deepClone(values)
+    },
+
+    getValuesView(): Readonly<Record<string, unknown>> {
+      return values
     },
 
     getStatus(path: string): FieldStatus {
