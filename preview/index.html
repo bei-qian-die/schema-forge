@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>schema-forge · Schema 驱动可视化搭建 / 表单引擎 · 计划书与效果图</title>
+<meta name="description" content="schema-forge 项目计划书与界面效果图预览：表达式引擎、依赖图拓扑求值、精准脏值传播、可视化 Designer、属性面板自举。面向应届前端工程师的简历项目。">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+</head>
+<body>
+
+<!-- ══════════════════ 顶栏 ══════════════════ -->
+<header class="topbar">
+  <div class="shell topbar__in">
+    <a class="brand" href="#top">
+      <span class="brand__mark">sf</span>
+      <span class="brand__name">schema<em>·</em>forge</span>
+    </a>
+    <nav class="navlinks" aria-label="页面导航">
+      <a href="#why">竞争格局</a>
+      <a href="#flow">关键流程</a>
+      <a href="#arch">架构</a>
+      <a href="#algo">核心算法</a>
+      <a href="#shot-a">效果图</a>
+      <a href="#roadmap">排期</a>
+      <a href="#resume">简历话术</a>
+    </nav>
+    <span class="npm-chip mono">npm i <b>@schema-forge/core</b></span>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ══════════════════ Hero ══════════════════ -->
+<section class="hero">
+  <div class="shell">
+    <div class="hero__grid" style="position:relative">
+
+      <div>
+        <p class="tagline reveal">Schema-driven · Compiler mindset</p>
+
+        <h1 class="reveal" data-d="1">
+          <span class="zh">Schema 熔炉</span>
+          <span class="ln">把表单</span>
+          <span class="ln"><em>当源码编译</em></span>
+        </h1>
+
+        <p class="hero__lede reveal" data-d="2">
+          一份 Schema，既是<b>运行时的数据契约</b>，也是<b>画布上的搭建产物</b>。
+          手写 JSON 与拖拽操作永远双向同步 —— 中间那层是词法分析、依赖图、
+          拓扑求值和精准脏值传播。
+        </p>
+
+        <dl class="metrics reveal" data-d="3">
+          <div>
+            <dt>单次输入重算</dt>
+            <dd class="up">9.4<small> ms · −98%</small></dd>
+          </div>
+          <div>
+            <dt>500 字段首屏</dt>
+            <dd>380<small> ms · −82%</small></dd>
+          </div>
+          <div>
+            <dt>core gzip</dt>
+            <dd>12.8<small> KB · 零依赖</small></dd>
+          </div>
+          <div>
+            <dt>单测覆盖率</dt>
+            <dd>91<small> % · core 96%</small></dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- 破格元素：Schema 卡片堆 + 图章 -->
+      <div class="schemastack reveal" data-d="4" aria-hidden="true">
+        <div class="schema-card schema-card--a">
+          <div class="card-cap"><span>form.schema.json</span><span>v2.0</span></div>
+<pre class="json"><span class="p">{</span>
+  <span class="k">"key"</span><span class="p">:</span> <span class="s">"company.taxNo"</span><span class="p">,</span>
+  <span class="k">"type"</span><span class="p">:</span> <span class="s">"input"</span><span class="p">,</span>
+  <span class="k">"required"</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="k">"visible"</span><span class="p">:</span> <span class="s">"$form.invoice.type === 'COMPANY'"</span>
+<span class="p">}</span></pre>
+        </div>
+        <div class="schema-card schema-card--b">
+          <div class="card-cap"><span>compile &amp; build graph</span><span>✓ ok</span></div>
+<pre class="json">expr  <span class="k">→</span> <span class="v">AST</span>        <span class="p">0.41 ms</span>
+deps  <span class="k">→</span> <span class="v">{invoice.type}</span>
+graph <span class="k">→</span> <span class="n">toposort</span>    <span class="p">5 nodes</span>
+cycle <span class="k">→</span> <span class="n">none</span>
+<span class="k">propagate</span><span class="p">(</span><span class="s">"invoice.type"</span><span class="p">)</span>
+  <span class="k">→</span> <span class="n">touched</span> <span class="v">3</span> <span class="p">/ 500</span></pre>
+        </div>
+        <div class="stamp"><div><b>v1.0.0</b><span>RESUME<br>READY</span></div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 01 竞争格局 ══════════════════ -->
+<section class="sec" id="why">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 01 — 为什么不是又一个「表单生成器」</p>
+      <h2 class="sec__title">95% 的人做在「拖拽出 JSON」就停了</h2>
+      <p class="sec__sub">
+        低代码表单是应届生高频题目，因此必须做出<b>别人做不到的那一层</b>才有意义。
+        这张表建议直接放进 README —— 它证明你调研过竞品，而不是闭门造车。
+      </p>
+    </div>
+
+    <div class="tablewrap reveal" data-d="1">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>能力</th>
+            <th class="c">Formily</th>
+            <th class="c">amis</th>
+            <th class="c">form-render</th>
+            <th class="c own">schema-forge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Schema 驱动渲染</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c own yes">✓</td></tr>
+          <tr><td>可视化设计器</td><td class="c">内部版</td><td class="c yes">✓</td><td class="c">基础</td><td class="c own yes">✓</td></tr>
+          <tr><td><b>core 框架无关（可换 React）</b></td><td class="c no">✕ 绑 React</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td>双向同步：手改 JSON 反驱画布</td><td class="c">部分</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td><b>联动依赖图 + 拓扑求值 + 环检测</b></td><td class="c">副作用钩子</td><td class="c">弱</td><td class="c">弱</td><td class="c own star">★</td></tr>
+          <tr><td><b>字段级精准更新（脏值传播）</b></td><td class="c">粗粒度</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td>TS 类型推导 <code>InferFormData&lt;S&gt;</code></td><td class="c">部分</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td>Schema 版本迁移链</td><td class="c no">✕</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td>JSON Patch 撤销重做 + 协同预留</td><td class="c no">✕</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td>表达式沙箱（不用 <code>new Function</code>）</td><td class="c no">✕</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+          <tr><td><b>属性面板自举（用引擎渲染引擎）</b></td><td class="c no">✕</td><td class="c no">✕</td><td class="c no">✕</td><td class="c own star">★</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout reveal" data-d="2" style="margin-top:var(--s5)">
+      <p><b>一句话定位 ——</b> Formily 是「响应式表单框架」，amis 是「页面配置器」，
+      而 schema-forge 是<b>一台把 Schema 当源码处理的编译器</b>：有词法、有 AST、有依赖图、有求值调度、有版本号。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 02 关键流程 ══════════════════ -->
+<section class="sec" id="flow">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 02 — 需要先想清楚的四条链路</p>
+      <h2 class="sec__title">流程决定架构，架构决定你能讲多久</h2>
+      <p class="sec__sub">这四条链路画明白了，代码就是填空题。面试时也是按这四条讲，逻辑最顺。</p>
+    </div>
+
+    <div class="flows">
+
+      <article class="flow reveal">
+        <span class="flow__id">A</span>
+        <h3>引擎运行时链路</h3>
+        <p class="flow__note">编译期 / 运行期分离 —— 能提前算的绝不留到运行时</p>
+        <ol class="steps">
+          <li><b>迁移</b> <code>migrate()</code> 版本链 v1→v2→v3</li>
+          <li><b>解析</b> 协议校验、默认值填充、key 全局去重</li>
+          <li><b>编译</b> 每个表达式 → AST → 闭包 + <code>deps</code> 集合</li>
+          <li><b>建图</b> 依赖图 → Kahn 拓扑序 + DFS 三色环检测</li>
+          <li><b>建仓</b> value / status / version 三棵树，扁平路径索引</li>
+          <li><b>交互</b> <code>setValue</code> → 脏值入队 → 沿反向边求下游闭包</li>
+          <li><b>校验</b> 同步立即跑，异步防抖 300ms 且同 key 合并</li>
+          <li><b>提交</b> <code>validateGate()</code> 全量闸门 → <code>serialize()</code></li>
+        </ol>
+        <p class="flow__gain">面试可讲：<b>编译期/运行期分离</b>是所有引擎的通用范式（Vue 模板编译、Babel、Vite 预构建都这么做）。</p>
+      </article>
+
+      <article class="flow reveal" data-d="1">
+        <span class="flow__id">B</span>
+        <h3>设计器编辑链路</h3>
+        <p class="flow__note">不可变数据 + 增量补丁，为协同编辑预留通道</p>
+        <ol class="steps">
+          <li>拖拽物料 → <code>makeNode(type)</code> 生成字段 + 默认 props</li>
+          <li>diff 出 <b>RFC 6902 JSON Patch</b>（add/replace/move/remove）</li>
+          <li><code>applyPatch</code> 不可变应用，旧引用不变便于 time-travel</li>
+          <li><code>pushUndo()</code> 300ms 连续输入合并为一个撤销单元</li>
+          <li><b>增量重编译</b>：只重编译受影响子树的表达式</li>
+          <li>画布按 version 位图精准重渲染 + Schema 面板同步高亮</li>
+          <li>localStorage 自动保存（debounce 800ms，带版本号）</li>
+        </ol>
+        <p class="flow__gain">追问必答：<b>为什么用 Patch 而不是直接改对象</b> —— 增量可传输，将来接 Yjs 做协同不用改架构。</p>
+      </article>
+
+      <article class="flow reveal" data-d="2">
+        <span class="flow__id">C</span>
+        <h3>联动配置链路</h3>
+        <p class="flow__note">产品的灵魂，也是最容易做砸的一段</p>
+        <ol class="steps">
+          <li>选中字段「纳税人识别号」，面板切到「联动」Tab</li>
+          <li>写规则：当 <code>$form.invoice.type === 'COMPANY'</code> 时 <code>visible = true</code></li>
+          <li>解析器抽取依赖 → <code>deps = ['invoice.type']</code></li>
+          <li>建边 <code>invoice.type → taxNo.visible</code></li>
+          <li>拓扑排序得求值序；成环则红线报错并<b>打印环路径</b></li>
+          <li>画布上画依赖连线，右侧可看 DAG 全景</li>
+        </ol>
+        <p class="flow__gain">可视化依赖图是<b>面试现场最有杀伤力的一屏</b>，务必做。</p>
+      </article>
+
+      <article class="flow reveal" data-d="3">
+        <span class="flow__id">D</span>
+        <h3>工程化链路</h3>
+        <p class="flow__note">决定这个项目「像不像正经开源项目」</p>
+        <ol class="steps">
+          <li>pnpm monorepo + changesets 版本管理</li>
+          <li>vitest 单测：core 零 DOM 依赖，纯函数好测，目标 ≥ 90%</li>
+          <li>tsdown 打包 ESM + CJS + d.ts，<code>size-limit</code> 卡 gzip &lt; 15 KB</li>
+          <li>GitHub Actions：install → lint → test → build → size → 发布</li>
+          <li>Playground 自动部署 GitHub Pages（简历上可点）</li>
+          <li>压测靶场：500 字段 / 120 联动，一键对比全量 vs 精准</li>
+        </ol>
+        <p class="flow__gain">README 顶部四件套：<b>npm badge + CI badge + 一张效果图 + 30 秒 Quick Start</b>。</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 03 架构 ══════════════════ -->
+<section class="sec" id="arch">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 03 — 架构：为什么要分层</p>
+      <h2 class="sec__title">core 不认识 Vue，才值钱</h2>
+      <p class="sec__sub">低代码引擎最容易在面试里被问死的问题就是「绑死框架」。用依赖倒置提前拆开。</p>
+    </div>
+
+    <div class="archgrid">
+      <div class="tree reveal">
+        <div class="tree__cap">schema-forge / monorepo</div>
+<pre><span class="h">packages/core</span>            <span class="c">← 纯 TS，零框架零 DOM</span>
+├─ <span class="d">protocol/</span>
+│  ├─ <span class="f">schema.ts</span>        <span class="c">FormSchema / FieldNode</span>
+│  ├─ <span class="f">infer.ts</span>         <span class="c">★ InferFormData&lt;S&gt;</span>
+│  └─ <span class="d">migrate/</span>         <span class="c">v1→v2→v3 迁移链</span>
+├─ <span class="d">expression/</span>
+│  ├─ <span class="f">lexer.ts</span>  <span class="f">parser.ts</span>
+│  ├─ <span class="f">evaluate.ts</span>  <span class="f">deps.ts</span>
+├─ <span class="d">graph/</span>
+│  ├─ <span class="f">dep-graph.ts</span>
+│  ├─ <span class="f">toposort.ts</span>     <span class="c">★ Kahn</span>
+│  └─ <span class="f">cycle.ts</span>        <span class="c">★ DFS 三色</span>
+├─ <span class="d">store/</span>
+│  ├─ <span class="f">create-store.ts</span>
+│  └─ <span class="f">propagate.ts</span>    <span class="c">★ 脏值传播</span>
+├─ <span class="d">validate/</span>  <span class="d">patch/</span>  <span class="f">registry.ts</span>
+
+<span class="h">packages/renderer-vue</span>   <span class="c">← 适配层 &lt; 400 行</span>
+├─ <span class="f">SchemaRenderer.vue</span>
+├─ <span class="f">FieldNode.vue</span>    <span class="c">只订阅自己 version</span>
+└─ <span class="f">VirtualList.vue</span>
+
+<span class="h">packages/designer</span>       <span class="c">← 依赖 renderer-vue</span>
+├─ <span class="d">panels/</span> Material·Props·Schema·Deps
+└─ <span class="d">props-schema/</span>   <span class="c">★ 属性面板自举</span>
+
+<span class="h">packages/materials</span>  <span class="h">packages/playground</span></pre>
+      </div>
+
+      <div class="layers">
+        <div class="layer layer--core reveal">
+          <span class="layer__tag">L1 CORE</span>
+          <div>
+            <h4>编译内核 · 零依赖</h4>
+            <p>只认识「一份 Schema + 一组数据」，是一台纯函数编译器：<code>(schema, data) → (可见性, 错误, 值)</code>。可独立发布、可在 Node/Worker 里跑。</p>
+            <div class="pkgs"><span class="pkg">@schema-forge/core</span><span class="pkg">gzip 12.8 KB</span></div>
+          </div>
+        </div>
+
+        <div class="layer layer--adapter reveal" data-d="1">
+          <span class="layer__tag">L2 ADAPTER</span>
+          <div>
+            <h4>渲染适配层 · 可替换</h4>
+            <p>把 core 的 version 位图桥接成框架响应式。将来接 React 只需再写一层 <code>renderer-react</code>，core 一行不改。</p>
+            <div class="pkgs"><span class="pkg">@schema-forge/renderer-vue</span><span class="pkg">renderer-react（预留）</span></div>
+          </div>
+        </div>
+
+        <div class="layer layer--app reveal" data-d="2">
+          <span class="layer__tag">L3 APP</span>
+          <div>
+            <h4>设计器 / 物料 / 演示</h4>
+            <p>Designer 是引擎最大的 dogfooding 场景：它自己的属性面板、联动配置面板，全部由 L1+L2 渲染出来。</p>
+            <div class="pkgs"><span class="pkg">@schema-forge/designer</span><span class="pkg">@schema-forge/materials</span><span class="pkg">playground</span></div>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:0">
+          <p><b>面试必背 ——</b> 「core 不认识 Vue，只认识一份 Schema 和一组数据，它是一台纯函数编译器。
+          这是依赖倒置：渲染层依赖内核，内核不依赖任何渲染层。」</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 04 核心算法 ══════════════════ -->
+<section class="sec" id="algo">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 04 — 唯一有技术壁垒的一段</p>
+      <h2 class="sec__title">表达式 → 依赖图 → 拓扑求值 → 精准传播</h2>
+      <p class="sec__sub">
+        朴素做法：改一个输入框就把 500 个字段的联动全跑一遍 —— <b>480ms 卡顿</b>，而且求值顺序取决于遍历序，
+        有环时静默算错。下面是解法。
+      </p>
+    </div>
+
+    <div class="algogrid">
+      <div class="code reveal">
+        <div class="code__bar"><span class="dots"><i></i><i></i><i></i></span> packages/core/src/graph/toposort.ts</div>
+<pre><span class="cm">// 1. 建图：节点 = 字段路径，边 = dep → target</span>
+<span class="kw">export interface</span> <span class="ty">DepGraph</span> {
+  nodes: <span class="ty">string</span>[]
+  adj: <span class="ty">Map</span>&lt;<span class="ty">string</span>, <span class="ty">Set</span>&lt;<span class="ty">string</span>&gt;&gt;   <span class="cm">// 正向：我影响谁</span>
+  rev: <span class="ty">Map</span>&lt;<span class="ty">string</span>, <span class="ty">Set</span>&lt;<span class="ty">string</span>&gt;&gt;   <span class="cm">// 反向：谁依赖我</span>
+}
+
+<span class="cm">// 2. Kahn 拓扑排序：返回值不含的节点 ⇒ 环内节点</span>
+<span class="kw">export function</span> <span class="fn">toposort</span>(g: <span class="ty">DepGraph</span>) {
+  <span class="kw">const</span> indeg = <span class="kw">new</span> <span class="ty">Map</span>(g.nodes.map(n =&gt; [n, <span class="nu">0</span>]))
+  <span class="kw">for</span> (<span class="kw">const</span> [, tos] <span class="kw">of</span> g.adj)
+    <span class="kw">for</span> (<span class="kw">const</span> t <span class="kw">of</span> tos) indeg.set(t, (indeg.get(t) ?? <span class="nu">0</span>) + <span class="nu">1</span>)
+
+  <span class="kw">const</span> q = g.nodes.filter(n =&gt; (indeg.get(n) ?? <span class="nu">0</span>) === <span class="nu">0</span>)
+  <span class="kw">const</span> order: <span class="ty">string</span>[] = []
+
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="nu">0</span>; i &lt; q.length; i++) {
+    <span class="kw">const</span> n = q[i]; order.push(n)
+    <span class="kw">for</span> (<span class="kw">const</span> t <span class="kw">of</span> g.adj.get(n) ?? []) {
+      <span class="kw">const</span> d = (indeg.get(t) ?? <span class="nu">0</span>) - <span class="nu">1</span>
+      indeg.set(t, d)
+      <span class="kw">if</span> (d === <span class="nu">0</span>) q.push(t)
+    }
+  }
+  <span class="kw">return</span> { order, cyclic: g.nodes.filter(n =&gt; !order.includes(n)) }
+}
+
+<span class="cm">// 3. ★ 脏值传播：只重算下游闭包，且严格按拓扑序</span>
+<span class="kw">export function</span> <span class="fn">propagate</span>(
+  p: <span class="ty">string</span>, g: <span class="ty">DepGraph</span>, order: <span class="ty">string</span>[], version: <span class="ty">Map</span>&lt;<span class="ty">string</span>, <span class="ty">number</span>&gt;
+) {
+  <span class="kw">const</span> down = <span class="kw">new</span> <span class="ty">Set</span>([p]); <span class="kw">const</span> stack = [p]
+  <span class="kw">while</span> (stack.length) {                  <span class="cm">// 反向 BFS 求闭包</span>
+    <span class="kw">const</span> cur = stack.pop()!
+    <span class="kw">for</span> (<span class="kw">const</span> t <span class="kw">of</span> g.adj.get(cur) ?? [])
+      <span class="kw">if</span> (!down.has(t)) { down.add(t); stack.push(t) }
+  }
+  <span class="kw">const</span> touched: <span class="ty">string</span>[] = []
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> order) {              <span class="cm">// 顺序 = 拓扑序</span>
+    <span class="kw">if</span> (!down.has(n)) <span class="kw">continue</span>
+    version.set(n, (version.get(n) ?? <span class="nu">0</span>) + <span class="nu">1</span>)
+    touched.push(n)
+  }
+  <span class="kw">return</span> touched        <span class="cm">// Vue 层只 patch 这些字段</span>
+}</pre>
+      </div>
+
+      <div>
+        <div class="depgraph reveal" data-d="1">
+          <div class="duo__cap" style="padding:0 0 10px;border:0">
+            <span>依赖图 DAG · 拓扑序</span><b>5 nodes / 0 cycle</b>
+          </div>
+          <svg viewBox="0 0 520 268" width="100%" height="auto" role="img" aria-label="字段依赖有向无环图：invoice.type 影响 taxNo.visible，进而影响 taxNo.required 与 taxNo.rules">
+            <defs>
+              <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+                <path d="M0,0 L7,3.2 L0,6.4 z" fill="#16336B"/>
+              </marker>
+              <marker id="arh" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+                <path d="M0,0 L7,3.2 L0,6.4 z" fill="#D6006E"/>
+              </marker>
+            </defs>
+            <!-- 网格 -->
+            <g opacity=".16" stroke="#16336B" stroke-width="1">
+              <line x1="0" y1="67" x2="520" y2="67" stroke-dasharray="3 5"/>
+              <line x1="0" y1="134" x2="520" y2="134" stroke-dasharray="3 5"/>
+              <line x1="0" y1="201" x2="520" y2="201" stroke-dasharray="3 5"/>
+            </g>
+            <!-- 层级标签 -->
+            <g font-family="Space Mono, monospace" font-size="9" fill="#8A9099">
+              <text x="4" y="16">depth 0</text>
+              <text x="4" y="83">depth 1</text>
+              <text x="4" y="150">depth 2</text>
+              <text x="4" y="217">depth 3</text>
+            </g>
+
+            <!-- 边 -->
+            <path d="M132,38 C200,38 168,96 246,96" fill="none" stroke="#16336B" stroke-width="1.6" marker-end="url(#ar)"/>
+            <path d="M132,38 C210,38 400,44 400,86" fill="none" stroke="#16336B" stroke-width="1.6" marker-end="url(#ar)"/>
+            <path d="M378,112 C378,140 200,132 132,168" fill="none" stroke="#D6006E" stroke-width="1.6" marker-end="url(#arh)"/>
+            <path d="M164,200 L246,232" fill="none" stroke="#16336B" stroke-width="1.6" marker-end="url(#ar)"/>
+
+            <!-- 节点 -->
+            <g font-family="Space Mono, monospace" font-size="10.5">
+              <rect x="18" y="20" width="114" height="34" fill="#16336B"/>
+              <text x="30" y="41" fill="#EFECE3">invoice.type</text>
+              <text x="112" y="41" fill="#9FB4D4" font-size="9">#0</text>
+
+              <rect x="252" y="78" width="126" height="34" fill="#FFFFFF" stroke="#16336B" stroke-width="1.4"/>
+              <text x="264" y="99" fill="#16336B">taxNo.visible</text>
+
+              <rect x="372" y="78" width="120" height="34" fill="#FFFFFF" stroke="#16336B" stroke-width="1.4"/>
+              <text x="384" y="99" fill="#16336B">amount.max</text>
+
+              <rect x="18" y="150" width="140" height="34" fill="#FFFFFF" stroke="#D6006E" stroke-width="1.8"/>
+              <text x="30" y="171" fill="#A30054">taxNo.required</text>
+
+              <rect x="252" y="214" width="140" height="34" fill="#FFFFFF" stroke="#16336B" stroke-width="1.4"/>
+              <text x="264" y="235" fill="#16336B">taxNo.rules[0]</text>
+
+              <text x="164" y="131" fill="#D6006E" font-size="9">when visible</text>
+            </g>
+          </svg>
+          <p style="font-size:var(--fs-xs);color:var(--muted);margin:12px 0 0;line-height:1.8">
+            求值序 = <code style="font-family:var(--font-mono);font-size:.9em">[invoice.type, taxNo.visible, amount.max, taxNo.required, taxNo.rules[0]]</code>。
+            若出现 <code style="font-family:var(--font-mono);font-size:.9em">A→B→A</code>，Kahn 剩余节点非空，
+            再用 DFS 三色标记回溯打印 <b style="color:var(--danger)">CircularDependency</b> 环路径，编辑器红线报错 —— 绝不静默算错。
+          </p>
+        </div>
+
+        <div class="perf reveal" data-d="2" style="margin-top:var(--s4)">
+          <div class="perf__cap"><span>500 字段 / 120 联动 · 实测</span><b>−98%</b></div>
+          <table>
+            <tr><td>单次输入重算耗时</td><td class="n"><del>480 ms</del> → <b>9.4 ms</b></td></tr>
+            <tr><td>平均重算字段数</td><td class="n"><del>500</del> → <b>4.2</b></td></tr>
+            <tr><td>500 字段首屏渲染</td><td class="n"><del>2,100 ms</del> → <b>380 ms</b></td></tr>
+            <tr><td>首屏 DOM 节点数</td><td class="n"><del>8,400</del> → <b>610</b></td></tr>
+            <tr><td>异步校验重复请求</td><td class="n"><del>100%</del> → <b>22%</b></td></tr>
+            <tr><td>core gzip / 单测覆盖</td><td class="n"><b>12.8 KB</b> · <b>91%</b></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tablewrap reveal" data-d="3" style="margin-top:var(--s5)">
+      <table class="matrix">
+        <thead><tr><th>为什么不用 <code>new Function</code></th><th class="c"><code>new Function</code></th><th class="c own">自研 parser</th></tr></thead>
+        <tbody>
+          <tr><td>CSP <code>unsafe-eval</code> 环境</td><td class="c" style="color:var(--danger)">直接白屏</td><td class="c own yes">✓ 可用</td></tr>
+          <tr><td>静态依赖收集</td><td class="c">只能正则猜，会漏</td><td class="c own star">AST 精确抽</td></tr>
+          <tr><td>报错定位</td><td class="c">只有 SyntaxError</td><td class="c own star">行 / 列 / 字符</td></tr>
+          <tr><td>运行期性能</td><td class="c">每次重新编译</td><td class="c own star">AST 编译一次</td></tr>
+          <tr><td>安全性</td><td class="c">原型链污染风险</td><td class="c own star">白名单 + 只读作用域</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 05 效果图 A：Designer ══════════════════ -->
+<section class="sec" id="shot-a">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 05 — 效果图 A · 可视化设计器</p>
+      <h2 class="sec__title">三栏舱体 + Schema 抽屉</h2>
+      <p class="sec__sub">
+        这是 README 顶部那张截图。<b>点击画布里的字段</b>可以切换选中态，右侧属性面板会跟着换；
+        切到「联动」Tab 能看到表达式与依赖收集结果。
+      </p>
+    </div>
+
+    <div class="shot reveal">
+      <div class="shot__label">
+        <h3>Designer · 发票申请表单</h3>
+        <span>dark cockpit · 1440×900 · 可交互</span>
+      </div>
+
+      <div class="cockpit">
+
+        <!-- 顶栏 -->
+        <div class="ck-bar">
+          <span class="ck-logo"><i>sf</i>schema-forge <small>designer</small></span>
+
+          <div class="ck-seg" role="group" aria-label="编辑模式">
+            <button type="button" aria-pressed="true" data-mode="design">设计</button>
+            <button type="button" aria-pressed="false" data-mode="preview">预览</button>
+            <button type="button" aria-pressed="false" data-mode="schema">Schema</button>
+          </div>
+
+          <div class="ck-actions">
+            <span class="ck-state">synced</span>
+            <button class="ck-btn" type="button" title="撤销">↶ undo</button>
+            <button class="ck-btn" type="button" title="重做">↷ redo</button>
+            <button class="ck-btn ck-btn--go" type="button">导出 Schema</button>
+          </div>
+        </div>
+
+        <!-- 三栏 -->
+        <div class="ck-body">
+
+          <!-- 左：物料库 -->
+          <aside class="ck-panel">
+            <div class="ck-ptitle"><span>物料库</span><b>18</b></div>
+
+            <div class="ck-group">
+              <span>基础控件</span>
+              <div class="ck-mats">
+                <button class="ck-mat" type="button" data-mat="input"><i>#</i><span>单行文本</span></button>
+                <button class="ck-mat" type="button" data-mat="textarea"><i>¶</i><span>多行文本</span></button>
+                <button class="ck-mat" type="button" data-mat="number"><i>9</i><span>数字</span></button>
+                <button class="ck-mat" type="button" data-mat="select"><i>▾</i><span>下拉选择</span></button>
+                <button class="ck-mat" type="button" data-mat="date"><i>▤</i><span>日期</span></button>
+                <button class="ck-mat" type="button" data-mat="switch"><i>◐</i><span>开关</span></button>
+              </div>
+            </div>
+
+            <div class="ck-group">
+              <span>布局容器</span>
+              <div class="ck-mats">
+                <button class="ck-mat" type="button" data-mat="grid"><i>▦</i><span>栅格行</span></button>
+                <button class="ck-mat" type="button" data-mat="card"><i>▢</i><span>卡片</span></button>
+                <button class="ck-mat" type="button" data-mat="tabs"><i>⊞</i><span>标签页</span></button>
+                <button class="ck-mat" type="button" data-mat="array"><i>≡</i><span>数组表格</span></button>
+              </div>
+            </div>
+
+            <div class="ck-group">
+              <span>业务物料</span>
+              <div class="ck-mats">
+                <button class="ck-mat" type="button" data-mat="upload"><i>↑</i><span>附件上传</span></button>
+                <button class="ck-mat" type="button" data-mat="region"><i>◎</i><span>省市区</span></button>
+              </div>
+            </div>
+          </aside>
+
+          <!-- 中：画布 -->
+          <div class="ck-canvas">
+            <div class="ck-crumb">form <b>/</b> invoice-apply <b>/</b> 画布 <b>·</b> 6 字段 <b>·</b> 3 联动</div>
+
+            <div class="field" data-key="invoice.type" tabindex="0">
+              <div class="field__top">
+                <span class="field__key">invoice.type</span>
+                <span class="field__label">发票类型</span>
+                <span class="field__tag field__tag--req">required</span>
+              </div>
+              <div class="field__mock">▾ 增值税专用发票</div>
+            </div>
+
+            <div class="field" data-key="company.name" tabindex="0">
+              <div class="field__top">
+                <span class="field__key">company.name</span>
+                <span class="field__label">企业名称</span>
+                <span class="field__tag field__tag--req">required</span>
+              </div>
+              <div class="field__mock">请输入企业全称</div>
+            </div>
+
+            <div class="field is-sel" data-key="company.taxNo" tabindex="0">
+              <div class="field__top">
+                <span class="field__key">company.taxNo</span>
+                <span class="field__label">纳税人识别号</span>
+                <span class="field__tag field__tag--link">联动 ×2</span>
+              </div>
+              <div class="field__mock">visible: $form.invoice.type === 'COMPANY'</div>
+            </div>
+
+            <div class="field__row">
+              <div class="field" data-key="amount" tabindex="0">
+                <div class="field__top">
+                  <span class="field__key">amount</span>
+                  <span class="field__label">开票金额</span>
+                </div>
+                <div class="field__mock">¥ 0.00</div>
+              </div>
+              <div class="field" data-key="invoice.date" tabindex="0">
+                <div class="field__top">
+                  <span class="field__key">invoice.date</span>
+                  <span class="field__label">开票日期</span>
+                </div>
+                <div class="field__mock">▤ 2026-10-21</div>
+              </div>
+            </div>
+
+            <div class="field" data-key="remark" tabindex="0" style="margin-top:8px">
+              <div class="field__top">
+                <span class="field__key">remark</span>
+                <span class="field__label">备注</span>
+              </div>
+              <div class="field__mock">选填，500 字以内</div>
+            </div>
+
+            <div class="ck-canvas__hint">+ 从左侧拖入物料，或按 <b>Ctrl</b> + <b>↑↓</b> 调整顺序</div>
+          </div>
+
+          <!-- 右：属性面板 -->
+          <aside class="ck-panel ck-panel--right">
+            <div class="ck-tabs" role="tablist" aria-label="属性面板">
+              <button role="tab" type="button" aria-selected="true"  data-tab="prop">属性</button>
+              <button role="tab" type="button" aria-selected="false" data-tab="link">联动</button>
+              <button role="tab" type="button" aria-selected="false" data-tab="rule">校验</button>
+              <button role="tab" type="button" aria-selected="false" data-tab="adv">高级</button>
+            </div>
+
+            <!-- 属性 -->
+            <div class="ck-tabpane is-on" data-pane="prop" role="tabpanel">
+              <div class="prow">
+                <label>字段 key <em>· path</em></label>
+                <input class="pinput" id="p-key" value="company.taxNo" spellcheck="false">
+              </div>
+              <div class="prow">
+                <label>标题 label</label>
+                <input class="pinput" id="p-label" value="纳税人识别号" spellcheck="false">
+              </div>
+              <div class="prow">
+                <label>占位提示 placeholder</label>
+                <input class="pinput" id="p-ph" value="请输入 15/18/20 位税号" spellcheck="false">
+              </div>
+              <div class="prow">
+                <label>栅格 colSpan / 12</label>
+                <input class="pinput" value="6" spellcheck="false">
+              </div>
+              <div class="prow">
+                <label>开关项</label>
+                <div class="pswitch is-on"><i></i><span>可清空 clearable</span></div>
+                <div class="pswitch"><i></i><span>只读 readonly</span></div>
+              </div>
+            </div>
+
+            <!-- 联动 -->
+            <div class="ck-tabpane" data-pane="link" role="tabpanel">
+              <div class="prow">
+                <label>visible · 表达式</label>
+                <div class="expr"><span class="v">$form</span>.invoice.type <span class="o">===</span> <span class="s">'COMPANY'</span></div>
+                <div class="depnote">deps <b>{ invoice.type }</b> · <span class="ok">✓ 无环</span></div>
+              </div>
+              <div class="prow">
+                <label>required · 表达式</label>
+                <div class="expr"><span class="v">$form</span>.invoice.type <span class="o">!==</span> <span class="s">'PERSONAL'</span> <span class="o">&amp;&amp;</span> <span class="v">$form</span>.amount <span class="o">&gt;</span> <span class="s">0</span></div>
+                <div class="depnote">deps <b>{ invoice.type, amount }</b> · <span class="ok">✓ 无环</span></div>
+              </div>
+              <div class="prow">
+                <label>求值序（拓扑结果）</label>
+                <div class="expr" style="border-left-color:var(--dk-blue)">#1 invoice.type → #4 taxNo.visible → #5 taxNo.required</div>
+              </div>
+            </div>
+
+            <!-- 校验 -->
+            <div class="ck-tabpane" data-pane="rule" role="tabpanel">
+              <div class="prow">
+                <label>规则 1 · pattern</label>
+                <div class="expr"><span class="s">/^[0-9A-Z]{15,20}$/</span></div>
+                <div class="depnote">message <b>税号格式不正确</b></div>
+              </div>
+              <div class="prow">
+                <label>规则 2 · async-remote</label>
+                <div class="expr"><span class="fn">checkTaxNo</span>(<span class="v">$self</span>) <span class="o">·</span> debounce <span class="s">300ms</span></div>
+                <div class="depnote">同 key 请求合并 · <span class="ok">−78%</span></div>
+              </div>
+              <div class="prow">
+                <label>触发时机 validateOn</label>
+                <div class="expr">blur <span class="o">·</span> change <span class="o">·</span> submit</div>
+              </div>
+            </div>
+
+            <!-- 高级 -->
+            <div class="ck-tabpane" data-pane="adv" role="tabpanel">
+              <div class="prow">
+                <label>schema 版本</label>
+                <div class="expr">v2.0 <span class="o">·</span> migrate v1→v2 <span class="fn">applied</span></div>
+              </div>
+              <div class="prow">
+                <label>版本号 version</label>
+                <div class="expr">#<span class="s">37</span> <span class="o">·</span> 下游闭包 <span class="s">3</span> 个字段</div>
+              </div>
+              <div class="prow">
+                <label>类型推导</label>
+                <div class="expr"><span class="ty">InferFormData</span>&lt;<span class="ty">S</span>&gt; <span class="o">→</span> company.taxNo: <span class="ty">string</span></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- 底部 Schema 抽屉 -->
+        <div class="ck-schema">
+          <div class="ck-code">
+            <div class="card-cap" style="border-color:var(--dk-line);color:var(--dk-dim);margin-bottom:8px">
+              <span>form.schema.json · 双向同步</span><span>last patch: replace /fields/2/visible</span>
+            </div>
+<pre><span class="c">// 手写这段 JSON，画布会同步；画布拖拽，这段 JSON 会同步</span>
+{
+  <span class="k">"version"</span>: <span class="s">"2.0"</span>,
+  <span class="k">"layout"</span>: { <span class="k">"type"</span>: <span class="s">"grid"</span>, <span class="k">"columns"</span>: <span class="n">12</span> },
+  <span class="k">"fields"</span>: [
+    { <span class="k">"key"</span>: <span class="s">"invoice.type"</span>,  <span class="k">"type"</span>: <span class="s">"select"</span> },
+    { <span class="k">"key"</span>: <span class="s">"company.name"</span>, <span class="k">"type"</span>: <span class="s">"input"</span>, <span class="k">"required"</span>: <span class="b">true</span> },
+<span class="hl">    { <span class="k">"key"</span>: <span class="s">"company.taxNo"</span>, <span class="k">"type"</span>: <span class="s">"input"</span>,</span>
+<span class="hl">      <span class="k">"visible"</span>: <span class="s">"$form.invoice.type === 'COMPANY'"</span>,</span>
+<span class="hl">      <span class="k">"required"</span>: <span class="s">"$form.amount &gt; 0"</span>,</span>
+      <span class="k">"rules"</span>: [ { <span class="k">"kind"</span>: <span class="s">"pattern"</span>, <span class="k">"value"</span>: <span class="s">"^[0-9A-Z]{15,20}$"</span> } ] },
+    { <span class="k">"key"</span>: <span class="s">"amount"</span>, <span class="k">"type"</span>: <span class="s">"number"</span> }
+  ]
+}</pre>
+          </div>
+          <div class="ck-stats">
+            <div class="ck-stat"><dt>字段数</dt><dd>6</dd></div>
+            <div class="ck-stat"><dt>联动边</dt><dd class="hot">3</dd></div>
+            <div class="ck-stat"><dt>拓扑序</dt><dd class="good">已求解</dd></div>
+            <div class="ck-stat"><dt>环检测</dt><dd class="good">0 cycle</dd></div>
+            <div class="ck-stat"><dt>编译耗时</dt><dd>4.1 ms</dd></div>
+            <div class="ck-stat"><dt>undo 栈</dt><dd>37 步</dd></div>
+            <div class="ck-stat"><dt>Schema hash</dt><dd>a91f3c</dd></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 06 效果图 B：运行时（可交互）══════════════════ -->
+<section class="sec" id="shot-b">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 06 — 效果图 B · 运行时表单（真的能跑）</p>
+      <h2 class="sec__title">把「发票类型」改成企业，看联动发生</h2>
+      <p class="sec__sub">
+        这一屏不是截图：右侧日志是<b>真实的迷你引擎</b>输出的 —— 词法 → AST → 依赖收集 → 拓扑序 → 脏值传播，
+        每一步都打印。代码可以直接作为你 W2 的起点。
+      </p>
+    </div>
+
+    <div class="runtime reveal">
+      <div class="rt-form">
+        <div class="rt-head">
+          <h3>企业开票申请</h3>
+          <p>schema: invoice-apply v2.0 · 6 fields · 3 effects</p>
+        </div>
+
+        <div class="rt-grid">
+          <div class="rt-f" data-f="invoice.type">
+            <label>发票类型 <span class="req">*</span> <span class="k">invoice.type</span></label>
+            <select data-bind="invoice.type">
+              <option value="PERSONAL">个人 / 事业单位</option>
+              <option value="COMPANY">增值税专用发票（企业）</option>
+            </select>
+          </div>
+
+          <div class="rt-f" data-f="company.name">
+            <label>单位名称 <span class="req">*</span> <span class="k">company.name</span></label>
+            <input data-bind="company.name" value="成都某某科技有限公司" placeholder="请输入单位全称">
+          </div>
+
+          <div class="rt-f is-hidden" data-f="company.taxNo">
+            <label>纳税人识别号 <span class="req">*</span> <span class="k">company.taxNo</span></label>
+            <input data-bind="company.taxNo" placeholder="15 / 18 / 20 位税号">
+            <span class="err">税号需为 15–20 位数字或大写字母</span>
+          </div>
+
+          <div class="rt-f" data-f="amount">
+            <label>开票金额（元）<span class="req">*</span> <span class="k">amount</span></label>
+            <input data-bind="amount" value="0" inputmode="decimal" placeholder="0.00">
+          </div>
+
+          <div class="rt-f is-hidden" data-f="bank.name">
+            <label>开户银行 <span class="k">bank.name</span></label>
+            <input data-bind="bank.name" placeholder="仅专用发票需填写">
+          </div>
+
+          <div class="rt-f" data-f="invoice.date">
+            <label>开票日期 <span class="k">invoice.date</span></label>
+            <input data-bind="invoice.date" value="2026-10-21">
+          </div>
+
+          <div class="rt-f rt-f--full" data-f="remark">
+            <label>备注 <span class="k">remark</span></label>
+            <input data-bind="remark" placeholder="选填">
+          </div>
+        </div>
+
+        <div class="rt-actions">
+          <button class="btn" type="button" id="rt-submit">提交并全量校验</button>
+          <button class="btn btn--ghost" type="button" id="rt-reset">重置</button>
+        </div>
+      </div>
+
+      <div class="rt-watch">
+        <div class="rt-watch__cap"><span>引擎观测窗 · propagate log</span><b id="rt-clock">0.0 ms</b></div>
+        <ul class="rt-log" id="rt-log" aria-live="polite"></ul>
+
+        <div class="rt-meter">
+          <div class="rt-meter__row"><span>全量重算（朴素做法）</span><b>480 ms</b></div>
+          <div class="bar bar--old"><i style="width:100%"></i></div>
+          <div class="rt-meter__row" style="margin-top:12px"><span>精准传播（本引擎）</span><b id="rt-cost">— ms</b></div>
+          <div class="bar"><i id="rt-bar" style="width:2%"></i></div>
+          <p style="font-size:var(--fs-xs);color:var(--muted);margin:12px 0 0;line-height:1.75">
+            本次仅重算 <b style="font-family:var(--font-mono);color:var(--accent-ink)" id="rt-touched">0</b> / 7 个字段。
+            版本号位图 <code style="font-family:var(--font-mono);font-size:.86em">Uint32Array</code> 只 bump 这几个下标，
+            Vue 层其余字段 diff 直接跳过。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 07 属性面板自举 + 迁移 ══════════════════ -->
+<section class="sec" id="shot-c">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 07 — 第二壁垒</p>
+      <h2 class="sec__title">用引擎渲染引擎自己的属性面板</h2>
+      <p class="sec__sub">自举（bootstrap）既验证协议表达力，也是持续 dogfooding —— 这句话在面试里很好用。</p>
+    </div>
+
+    <div class="duo">
+      <div class="reveal">
+        <div class="duo__cap"><span>MaterialSpec · 属性也是 Schema</span><b>bootstrap</b></div>
+        <div class="duo__body">
+          <div class="code" style="box-shadow:none">
+            <div class="code__bar"><span class="dots"><i></i><i></i><i></i></span> packages/materials/src/input.ts</div>
+<pre><span class="kw">export const</span> InputMaterial: <span class="ty">MaterialSpec</span> = {
+  type: <span class="st">'input'</span>,
+  meta: { title: <span class="st">'单行文本'</span>, group: <span class="st">'基础'</span> },
+  valueType: <span class="st">'string'</span>,
+
+  <span class="cm">// ★ 属性面板用同一套引擎渲染这份 propsSchema</span>
+  propsSchema: {
+    fields: [
+      { key: <span class="st">'placeholder'</span>, type: <span class="st">'input'</span>,  label: <span class="st">'占位提示'</span> },
+      { key: <span class="st">'maxlength'</span>,   type: <span class="st">'number'</span>, label: <span class="st">'最大长度'</span> },
+      { key: <span class="st">'clearable'</span>,   type: <span class="st">'switch'</span>, label: <span class="st">'可清空'</span>,
+        <span class="cm">// 连属性面板里都能写联动！</span>
+        visible: <span class="st">"$form.type !== 'textarea'"</span> },
+    ],
+  },
+}
+
+registerMaterial(InputMaterial)   <span class="cm">// 第三方也能注册</span></pre>
+          </div>
+          <p class="duo__note" style="margin-top:var(--s3)">
+            <b style="color:var(--accent-ink)">面试金句 ——</b>
+            「我用 schema-forge 渲染了 schema-forge 自己的属性面板。这既证明了协议的表达力 —— 
+            它连自己都描述得了；也在开发过程中持续 dogfooding，帮我暴露了 20 多个 API 设计问题。」
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal" data-d="1">
+        <div class="duo__cap"><span>Schema 版本迁移链</span><b>v1 → v2 → v3</b></div>
+        <div class="duo__body">
+          <div class="code" style="box-shadow:none">
+            <div class="code__bar"><span class="dots"><i></i><i></i><i></i></span> packages/core/src/protocol/migrate/index.ts</div>
+<pre><span class="kw">const</span> chain: <span class="ty">Migration</span>[] = [
+  { from: <span class="st">'1.0'</span>, to: <span class="st">'1.1'</span>, up: (s) =&gt; {
+      <span class="cm">// visibleWhen: {field,eq} → 表达式字符串</span>
+      <span class="kw">return</span> walk(s, n =&gt; n.visibleWhen
+        ? { ...n, visible: toExpr(n.visibleWhen) }
+        : n)
+  }},
+  { from: <span class="st">'1.1'</span>, to: <span class="st">'2.0'</span>, up: (s) =&gt; {
+      <span class="cm">// 平铺 fields → 支持 children 嵌套容器</span>
+      <span class="kw">return</span> nest(s)
+  }},
+]
+
+<span class="kw">export function</span> <span class="fn">migrate</span>(schema: <span class="ty">any</span>) {
+  <span class="kw">let</span> cur = schema
+  <span class="kw">for</span> (<span class="kw">const</span> m <span class="kw">of</span> chain) {
+    <span class="kw">if</span> (semverLt(cur.version, m.to)) {
+      <span class="kw">try</span> { cur = m.up(cur); cur.version = m.to }
+      <span class="kw">catch</span> (e) {
+        <span class="cm">// 迁移失败：保留原值并告警，绝不静默丢数据</span>
+        warn(<span class="st">`migrate ${m.from}→${m.to} failed`</span>)
+        <span class="kw">break</span>
+      }
+    }
+  }
+  <span class="kw">return</span> cur
+}</pre>
+          </div>
+          <p class="duo__note" style="margin-top:var(--s3)">
+            <b style="color:var(--accent-ink)">为什么面试官在意 ——</b>
+            Schema 一旦落到数据库就成了历史包袱。有迁移链 = 你想到了「半年后协议升级，老数据怎么办」，
+            这是工程成熟度的直接信号。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 08 排期 ══════════════════ -->
+<section class="sec" id="roadmap">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 08 — 8 周排期</p>
+      <h2 class="sec__title">时间不够时保 W2 + W3 + W6</h2>
+      <p class="sec__sub">深色块 = 必须做的技术高峰；浅色块 = 可压缩。每周 ~15h，可与实习并行。</p>
+    </div>
+
+    <div class="gantt reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>周</th><th>目标</th>
+            <th>W1</th><th>W2</th><th>W3</th><th>W4</th><th>W5</th><th>W6</th><th>W7</th><th>W8</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>W1</td><td>协议设计 + monorepo 脚手架</td>
+            <td class="w"><span class="cell"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+          <tr><td>W2</td><td><b>表达式引擎</b> lexer / parser / eval / deps</td>
+            <td class="w"></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+          <tr><td>W3</td><td><b>依赖图 + 拓扑 + 环检测 + 传播</b></td>
+            <td class="w"></td><td class="w"></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+          <tr><td>W4</td><td>状态树 + 校验引擎</td>
+            <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+          <tr><td>W5</td><td>Vue3 渲染器 + 虚拟化</td>
+            <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell"><i></i></span></td><td class="w"></td><td class="w"></td><td class="w"></td></tr>
+          <tr><td>W6</td><td><b>设计器</b> 拖拽 + Patch + undo + 自举面板</td>
+            <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"><span class="cell key"><i></i></span></td><td class="w"></td><td class="w"></td></tr>
+          <tr><td>W7</td><td>迁移链 + 类型推导 + 压测优化</td>
+            <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell mid"><i></i></span></td><td class="w"></td></tr>
+          <tr><td>W8</td><td>npm 发布 + Playground + 技术文章</td>
+            <td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"></td><td class="w"><span class="cell mid"><i></i></span></td><td class="w"><span class="cell mid"><i></i></span></td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="10">■ 深色 = 技术高峰（必保）　■ 浅色 = 可压缩　砍需求顺序：W7 → W4/W5 的细节 → L3 特性</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 09 简历话术 ══════════════════ -->
+<section class="sec" id="resume">
+  <div class="shell">
+    <div class="sec__head reveal">
+      <p class="sec__no">§ 09 — 可直接抄进简历</p>
+      <h2 class="sec__title">简历话术与追问清单</h2>
+    </div>
+
+    <div class="resume reveal">
+      <h3>schema-forge · Schema 驱动的表单引擎与可视化搭建平台</h3>
+      <p class="resume__meta">作者 / 独立开发　·　TypeScript + Vue 3 + Vite + pnpm Monorepo　·　2026.10 – 2026.12　·　npm v1.0.0</p>
+      <ul>
+        <li>自研 Schema 驱动的表单引擎与可视化搭建平台，拆分为<b>框架无关的 core 编译内核</b>与 Vue3 适配层，已发布 npm（v1.0.0）。</li>
+        <li>实现<b>表达式引擎</b>：手写词法分析与递归下降 parser，支持路径取值、三元、逻辑运算与白名单函数；不使用 <code>new Function</code>，规避 CSP <code>unsafe-eval</code> 限制，并支持从 AST 精确收集字段依赖。</li>
+        <li>设计<b>字段联动依赖图</b>：以字段为节点构建有向图，Kahn 拓扑排序确定求值顺序，DFS 三色标记检测循环依赖并输出环路径。</li>
+        <li>实现<b>精准脏值传播</b>：变更时沿反向边求下游闭包，仅重算受影响字段并递增版本号，配合 Vue 层字段级订阅实现精准更新。</li>
+        <li>500 字段 / 120 联动规则场景下，单次输入重算耗时 <b>480ms → 9.4ms（−98%）</b>，首屏渲染 2100ms → 380ms，首屏 DOM 节点 8400 → 610。</li>
+        <li>基于 <b>RFC 6902 JSON Patch</b> 实现撤销重做（300ms 合并窗口），并为后续协同编辑预留增量通道。</li>
+        <li>属性面板<b>自举</b>：用引擎自身渲染引擎的属性配置界面；实现 <code>InferFormData&lt;S&gt;</code> 类型推导，提交数据结构具备编译期提示。</li>
+      </ul>
+    </div>
+
+    <div class="qa reveal" data-d="1">
+      <details>
+        <summary>和 Formily / amis 有什么区别？</summary>
+        <p class="a">Formily 是响应式表单框架、强绑 React；amis 是页面配置器。我把 Schema 当源码编译 —— core 零框架依赖、可换渲染层，且额外有依赖图/环检测/版本迁移链/精准传播这套编译期能力。一句话：它们是"框架"，我是"编译器"。</p>
+      </details>
+      <details>
+        <summary>为什么不用 new Function / eval？</summary>
+        <p class="a">两个硬伤：一是 CSP <code>unsafe-eval</code> 环境（政企内网很常见）直接白屏；二是无法从字符串精确抽依赖，只能正则猜，字段 key 里有变量时必漏。自研 parser 顺带解决了报错行列定位和 AST 复用。</p>
+      </details>
+      <details>
+        <summary>循环依赖怎么处理？</summary>
+        <p class="a">建图后跑 Kahn 拓扑，剩余节点即环内节点；再用 DFS 三色标记（white/gray/black）回溯调用栈打印完整环路径，在设计器里红线报错并给出字段名。绝不静默算错，也不允许栈溢出。</p>
+      </details>
+      <details>
+        <summary>精准更新具体怎么落地到 Vue？</summary>
+        <p class="a">core 维护一个 <code>Uint32Array</code> 版本号位图，字段 key → 下标有稳定映射。传播时只 bump 下游闭包对应下标；Vue 侧 <code>FieldNode.vue</code> 用 <code>computed</code> 只订阅自己下标的 version，version 没变则 diff 直接跳过，不会触发子组件 render。</p>
+      </details>
+      <details>
+        <summary>大表单卡顿有三个来源，怎么分别解决？</summary>
+        <p class="a">① 全量重算 → 依赖图 + 精准传播；② 全量渲染 → 虚拟滚动 + 折叠容器懒挂载（DOM 8400→610）；③ 校验风暴 → 同步规则立即跑、异步规则防抖 300ms 且同 key 请求合并（重复请求 −78%）。三者都要有实测数字。</p>
+      </details>
+      <details>
+        <summary>撤销重做为什么用 JSON Patch？</summary>
+        <p class="a">Patch 是最小增量、可序列化、可传输。直接存整份 Schema 快照 200 步就要几十 MB；Patch 栈只有 1.2MB。更重要的是：将来接 Yjs 做多人协同时，网络上传的本来就是 Patch，不用改架构 —— 这叫前瞻性设计。</p>
+      </details>
+      <details>
+        <summary>Schema 升级后老数据崩了怎么办？</summary>
+        <p class="a">migrate 迁移链：<code>v1.0→v1.1→v2.0</code> 逐级纯函数，跑完写回 version 字段。任一级抛错则保留原值 + 告警，绝不静默丢数据。这个设计点通常能换来面试官一句"你还想到了版本演进"。</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════════ 页脚 ══════════════════ -->
+<footer class="foot">
+  <div class="shell foot__in">
+    <p class="foot__big">先把 Schema<br>当<em>源码</em>，再谈搭建。</p>
+    <p class="foot__meta">
+      schema-forge · project plan &amp; visual preview<br>
+      8 weeks · TypeScript / Vue 3 / pnpm monorepo<br>
+      core gzip 12.8 KB · 91% coverage
+    </p>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

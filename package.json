@@ -1,0 +1,26 @@
+{
+  "name": "schema-forge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "description": "Schema-driven form engine and visual designer — compile your forms like source code.",
+  "scripts": {
+    "dev": "pnpm --filter @schema-forge/playground dev",
+    "build": "pnpm --filter @schema-forge/core build && pnpm --filter @schema-forge/playground build",
+    "preview": "pnpm --filter @schema-forge/playground preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@vitejs/plugin-vue": "5.2.4",
+    "tsdown": "0.9.9",
+    "typescript": "5.7.3",
+    "vite": "6.4.5",
+    "vitest": "2.1.9",
+    "vue": "3.5.44",
+    "vue-tsc": "2.2.12"
+  }
+}

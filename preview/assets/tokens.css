@@ -1,0 +1,180 @@
+/* ==========================================================================
+   schema-forge · 设计令牌层
+   方向：Technical Blueprint / 工程制图 —— 描图纸底、靛蓝结构线、等宽标注、品红批注
+   主题：Light（描图纸 #EFECE3 + 近黑墨）  单一强调色：品红 #D6006E（语义=选中/批注/关键动作）
+   字体：展示 Chakra Petch / 正文 Public Sans / 等宽 Space Mono
+   说明：产品舱体（Designer 效果图）用深色反转，与页面形成"图纸 vs 屏幕"的对比
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  /* —— 描图纸表面 —— */
+  --paper:         #EFECE3;   /* 纸底，微黄，非纯白 */
+  --paper-2:       #E5E1D4;   /* 沉底区 */
+  --surface:       #FBF9F3;
+  --surface-2:     #F5F2E8;
+  --surface-sunk:  #EDE9DC;
+
+  /* —— 墨色（近黑偏蓝，非 #000）—— */
+  --ink:           #101418;
+  --ink-2:         #2C333C;
+  --muted:         #5C626B;   /* 对纸底 5.2:1 */
+  --muted-2:       #8A9099;   /* 仅用于装饰文字 / 分隔标签 */
+
+  /* —— 结构线 —— */
+  --line:          #D6D1C1;
+  --line-soft:     #E2DDCE;
+  --line-strong:   #A9A393;
+
+  /* —— 主结构色：蓝图纸靛蓝 —— */
+  --blueprint:     #16336B;   /* 对纸底 10.3:1 */
+  --blueprint-2:   #1F4E9C;
+  --blueprint-wash:#E4E9F4;
+
+  /* —— 单一强调色：品红批注笔 —— */
+  --accent:        #D6006E;   /* 填充/描边 */
+  --accent-ink:    #A30054;   /* 文字变体，纸底 6.6:1 */
+  --accent-wash:   #FCEAF3;
+
+  /* —— 状态色 —— */
+  --ok:            #0E6B4F;
+  --ok-wash:       #E3F1EB;
+  --warn:          #9A6200;
+  --warn-wash:     #FAF0DA;
+  --danger:        #C2261B;
+  --danger-wash:   #FBEAE8;
+
+  /* ===== 深色舱体（Designer 产品效果图）===== */
+  --dk-bg:         #0C0F14;
+  --dk-surface:    #141920;
+  --dk-surface-2:  #1B222B;
+  --dk-surface-3:  #232C37;
+  --dk-line:       #2A333F;
+  --dk-line-2:     #3A4552;
+  --dk-text:       #E7EAEF;   /* 对 dk-bg 15.5:1 */
+  --dk-muted:      #8E98A6;   /* 6.2:1 */
+  --dk-dim:        #616B7A;
+  --dk-accent:     #FF2E88;   /* 对 dk-bg 5.4:1 */
+  --dk-accent-dim: #7A1544;
+  --dk-blue:       #4C7DF0;
+  --dk-blue-dim:   #1E2C4D;
+  --dk-ok:         #35C79A;
+  --dk-warn:       #E0A93B;
+  --dk-danger:     #FF6B5E;
+
+  /* —— 字阶（1.25 modular scale）—— */
+  --fs-hero:  clamp(2.75rem, 7vw, 5.9rem);
+  --fs-h2:    clamp(1.7rem, 3.3vw, 2.7rem);
+  --fs-h3:    clamp(1.12rem, 1.9vw, 1.5rem);
+  --fs-h4:    1.0625rem;
+  --fs-body:  1rem;
+  --fs-sm:    0.875rem;
+  --fs-xs:    0.79rem;
+  --fs-xxs:   0.7rem;
+
+  --font-display: 'Chakra Petch', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body:    'Public Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono:    'Space Mono', 'Cascadia Mono', Consolas, monospace;
+
+  /* —— 间距梯度 —— */
+  --s1: 4px;  --s2: 8px;  --s3: 16px; --s4: 24px;
+  --s5: 40px; --s6: 64px; --s7: 96px; --s8: 144px;
+
+  /* —— 圆角：制图风要硬朗 —— */
+  --r-sm: 2px; --r-md: 4px; --r-lg: 8px;
+
+  /* —— 阴影（带环境色而非纯黑）—— */
+  --sh-1: 0 1px 2px rgba(22, 51, 107, .07), 0 2px 6px rgba(22, 51, 107, .05);
+  --sh-2: 0 4px 12px rgba(22, 51, 107, .10), 0 8px 24px rgba(22, 51, 107, .08);
+  --sh-3: 0 12px 32px rgba(22, 51, 107, .14), 0 24px 64px rgba(22, 51, 107, .12);
+
+  /* —— 动效 —— */
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-base: 320ms;
+  --dur-slow: 640ms;
+
+  /* —— 栅格 —— */
+  --shell: 1280px;
+  --grid-unit: 26px;   /* 图纸网格基准 */
+}
+
+/* —— 基础重置 —— */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.72;
+  letter-spacing: .012em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 描图纸：细网格 + 极淡噪点，是整页的氛围层 */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right,  rgba(22,51,107,.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(22,51,107,.055) 1px, transparent 1px);
+  background-size: var(--grid-unit) var(--grid-unit);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -.022em;
+  margin: 0;
+  color: var(--ink);
+}
+p { margin: 0 0 var(--s3); }
+
+a { color: var(--blueprint-2); text-decoration: none; }
+a:hover { color: var(--accent-ink); }
+
+code, pre, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* —— 焦点可见 —— */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+/* —— 入场序列（3–6 组，错峰 80ms）—— */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+.reveal[data-d="1"] { transition-delay: 80ms; }
+.reveal[data-d="2"] { transition-delay: 160ms; }
+.reveal[data-d="3"] { transition-delay: 240ms; }
+.reveal[data-d="4"] { transition-delay: 320ms; }
+.reveal[data-d="5"] { transition-delay: 400ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal[data-d] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* —— 通用容器 —— */
+.shell { width: min(100% - 2 * var(--s4), var(--shell)); margin-inline: auto; }
+section { position: relative; z-index: 2; }

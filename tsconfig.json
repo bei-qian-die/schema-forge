@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@schema-forge/core": ["packages/core/src/index.ts"],
+      "@schema-forge/renderer-vue": ["packages/renderer-vue/src/index.ts"],
+      "@schema-forge/materials": ["packages/materials/src/index.ts"],
+      "@schema-forge/designer": ["packages/designer/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.vue",
+    "packages/*/test/**/*.ts",
+    "vitest.config.ts"
+  ]
+}
