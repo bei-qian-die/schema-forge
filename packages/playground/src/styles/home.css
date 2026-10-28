@@ -3,7 +3,8 @@
    Technical blueprint: tracing paper, indigo structure, one magenta marker.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+/* 不引用任何外部 CDN：国内访问 fonts.googleapis.com 会长时间挂起导致白屏，
+   改用系统字体栈保证页面一定能渲染出来。 */
 
 :root {
   --paper: #efece3;

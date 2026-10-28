@@ -5,3 +5,6 @@ coverage/
 .DS_Store
 .vite/
 *.log
+
+# 门户站构建产物（命名单数不是 dist/）
+dist-portal/
